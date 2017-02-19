@@ -17,13 +17,13 @@ namespace GSATPrediction.Controllers
         private StandarLevel level = new StandarLevel();
 
         [HttpPost]
-        public HttpResponseMessage aquireAllSubjectStandar(JObject point)
+        public HttpResponseMessage aquireAllSubjectStandar([FromBody]JObject point)
         {
-            Enter input = JsonConvert.DeserializeObject<Enter>(point.ToString());
+            Grades input = JsonConvert.DeserializeObject<Grades>(point.ToString());
             
             //查學測成績的標準
             DataOperation op = new DataOperation();
-            ArrayList list = op.changeScoreOfGSAT2Level(input.grades.gsat);
+            ArrayList list = op.changeScoreOfGSAT2Level(input.gsat);
 
             //轉換成人可以看的標準
             string[] judge = {"底標", "後標", "均標", "前標", "頂標" };
@@ -35,7 +35,7 @@ namespace GSATPrediction.Controllers
             }
 
             //塞資料
-            level.enter = input;
+            //level.enter = ;
             level.status = Convert.ToInt32(HttpStatusCode.OK);
             level.step = standar;
             
