@@ -19,11 +19,11 @@ namespace GSATPrediction.Controllers
         [HttpPost]
         public HttpResponseMessage aquireAllSubjectStandar([FromBody]JObject point)
         {
-            Grades input = JsonConvert.DeserializeObject<Grades>(point.ToString());
+            Enter input = JsonConvert.DeserializeObject<Enter>(point.ToString());
             
             //查學測成績的標準
             DataOperation op = new DataOperation();
-            ArrayList list = op.changeScoreOfGSAT2Level(input.gsat);
+            ArrayList list = op.changeScoreOfGSAT2Level(input.grades.gsat);
 
             //轉換成人可以看的標準
             string[] judge = {"底標", "後標", "均標", "前標", "頂標" };
