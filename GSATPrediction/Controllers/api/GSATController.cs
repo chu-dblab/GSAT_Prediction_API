@@ -35,7 +35,7 @@ namespace GSATPrediction.Controllers
             }
 
             //塞資料
-            //level.enter = ;
+            level.enter = input;
             level.status = Convert.ToInt32(HttpStatusCode.OK);
             level.step = standar;
             
