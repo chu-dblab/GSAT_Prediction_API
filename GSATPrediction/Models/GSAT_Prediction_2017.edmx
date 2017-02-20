@@ -1,0 +1,493 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="GSAT_Prediction_2017Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CG">
+          <Key>
+            <PropertyRef Name="Cname" />
+            <PropertyRef Name="Gname" />
+          </Key>
+          <Property Name="Cname" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Gname" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="D">
+          <Key>
+            <PropertyRef Name="DID" />
+          </Key>
+          <Property Name="DID" Type="int" Nullable="false" />
+          <Property Name="UName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UURL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="DName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="DURL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Salary" Type="int" Nullable="false" />
+          <Property Name="SalaryURL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="TL1" Type="int" Nullable="false" />
+          <Property Name="TL2" Type="int" Nullable="false" />
+          <Property Name="TL3" Type="int" Nullable="false" />
+          <Property Name="TL4" Type="int" Nullable="false" />
+          <Property Name="TL5" Type="int" Nullable="false" />
+          <Property Name="TL6" Type="int" Nullable="false" />
+          <Property Name="ELLEVEL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="C" Type="int" Nullable="false" />
+          <Property Name="E" Type="int" Nullable="false" />
+          <Property Name="M" Type="int" Nullable="false" />
+          <Property Name="S" Type="int" Nullable="false" />
+          <Property Name="N" Type="int" Nullable="false" />
+          <Property Name="T" Type="int" Nullable="false" />
+          <Property Name="CE" Type="int" Nullable="false" />
+          <Property Name="CM" Type="int" Nullable="false" />
+          <Property Name="CS" Type="int" Nullable="false" />
+          <Property Name="CN" Type="int" Nullable="false" />
+          <Property Name="CT" Type="int" Nullable="false" />
+          <Property Name="EM" Type="int" Nullable="false" />
+          <Property Name="ES" Type="int" Nullable="false" />
+          <Property Name="EN" Type="int" Nullable="false" />
+          <Property Name="ET" Type="int" Nullable="false" />
+          <Property Name="MS" Type="int" Nullable="false" />
+          <Property Name="MN" Type="int" Nullable="false" />
+          <Property Name="MT" Type="int" Nullable="false" />
+          <Property Name="SN" Type="int" Nullable="false" />
+          <Property Name="ST" Type="int" Nullable="false" />
+          <Property Name="NT" Type="int" Nullable="false" />
+          <Property Name="CEM" Type="int" Nullable="false" />
+          <Property Name="CES" Type="int" Nullable="false" />
+          <Property Name="CEN" Type="int" Nullable="false" />
+          <Property Name="CET" Type="int" Nullable="false" />
+          <Property Name="CMS" Type="int" Nullable="false" />
+          <Property Name="CMN" Type="int" Nullable="false" />
+          <Property Name="CMT" Type="int" Nullable="false" />
+          <Property Name="CSN" Type="int" Nullable="false" />
+          <Property Name="CST" Type="int" Nullable="false" />
+          <Property Name="CNT" Type="int" Nullable="false" />
+          <Property Name="EMS" Type="int" Nullable="false" />
+          <Property Name="EMN" Type="int" Nullable="false" />
+          <Property Name="EMT" Type="int" Nullable="false" />
+          <Property Name="ESN" Type="int" Nullable="false" />
+          <Property Name="EST" Type="int" Nullable="false" />
+          <Property Name="ENT" Type="int" Nullable="false" />
+          <Property Name="MSN" Type="int" Nullable="false" />
+          <Property Name="MST" Type="int" Nullable="false" />
+          <Property Name="MNT" Type="int" Nullable="false" />
+          <Property Name="SNT" Type="int" Nullable="false" />
+          <Property Name="CEMS" Type="int" Nullable="false" />
+          <Property Name="CEMN" Type="int" Nullable="false" />
+          <Property Name="CEMT" Type="int" Nullable="false" />
+          <Property Name="CESN" Type="int" Nullable="false" />
+          <Property Name="CEST" Type="int" Nullable="false" />
+          <Property Name="CENT" Type="int" Nullable="false" />
+          <Property Name="CMSN" Type="int" Nullable="false" />
+          <Property Name="CMST" Type="int" Nullable="false" />
+          <Property Name="CMNT" Type="int" Nullable="false" />
+          <Property Name="CSNT" Type="int" Nullable="false" />
+          <Property Name="EMSN" Type="int" Nullable="false" />
+          <Property Name="EMST" Type="int" Nullable="false" />
+          <Property Name="EMNT" Type="int" Nullable="false" />
+          <Property Name="ESNT" Type="int" Nullable="false" />
+          <Property Name="MSNT" Type="int" Nullable="false" />
+          <Property Name="CEMSN" Type="int" Nullable="false" />
+          <Property Name="CEMST" Type="int" Nullable="false" />
+          <Property Name="CEMNT" Type="int" Nullable="false" />
+          <Property Name="CESNT" Type="int" Nullable="false" />
+          <Property Name="CMSNT" Type="int" Nullable="false" />
+          <Property Name="EMSNT" Type="int" Nullable="false" />
+          <Property Name="CEMSNT" Type="int" Nullable="false" />
+          <Property Name="City" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PP" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Change" Type="nvarchar(max)" />
+          <Property Name="lastCriterion" Type="nvarchar(max)" />
+          <Property Name="rateOfThisYear" Type="nvarchar(max)" />
+          <Property Name="ExamURL" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="DC">
+          <Key>
+            <PropertyRef Name="DID" />
+            <PropertyRef Name="Cname" />
+          </Key>
+          <Property Name="DID" Type="int" Nullable="false" />
+          <Property Name="Cname" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="NewScoreData">
+          <Key>
+            <PropertyRef Name="Ename" />
+            <PropertyRef Name="Score" />
+          </Key>
+          <Property Name="Ename" Type="nvarchar" MaxLength="6" Nullable="false" />
+          <Property Name="Score" Type="int" Nullable="false" />
+          <Property Name="Percentage" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="OldScoreData">
+          <Key>
+            <PropertyRef Name="Ename" />
+            <PropertyRef Name="Score" />
+          </Key>
+          <Property Name="Ename" Type="nvarchar" MaxLength="6" Nullable="false" />
+          <Property Name="Score" Type="int" Nullable="false" />
+          <Property Name="Percentage" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="T">
+          <Key>
+            <PropertyRef Name="TName" />
+          </Key>
+          <Property Name="TName" Type="nchar" MaxLength="6" Nullable="false" />
+          <Property Name="Grade1" Type="int" Nullable="false" />
+          <Property Name="Grade2" Type="int" Nullable="false" />
+          <Property Name="Grade3" Type="int" Nullable="false" />
+          <Property Name="Grade4" Type="int" Nullable="false" />
+          <Property Name="Grade5" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_DC_D">
+          <End Role="D" Type="Self.D" Multiplicity="1" />
+          <End Role="DC" Type="Self.DC" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="D">
+              <PropertyRef Name="DID" />
+            </Principal>
+            <Dependent Role="DC">
+              <PropertyRef Name="DID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="GSAT_Prediction_2017ModelStoreContainer">
+          <EntitySet Name="CG" EntityType="Self.CG" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="D" EntityType="Self.D" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DC" EntityType="Self.DC" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NewScoreData" EntityType="Self.NewScoreData" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OldScoreData" EntityType="Self.OldScoreData" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="T" EntityType="Self.T" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_DC_D" Association="Self.FK_DC_D">
+            <End Role="D" EntitySet="D" />
+            <End Role="DC" EntitySet="DC" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="GSAT_Prediction_2017Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="CG">
+          <Key>
+            <PropertyRef Name="Cname" />
+            <PropertyRef Name="Gname" />
+          </Key>
+          <Property Name="Cname" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Gname" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="D">
+          <Key>
+            <PropertyRef Name="DID" />
+          </Key>
+          <Property Name="DID" Type="Int32" Nullable="false" />
+          <Property Name="UName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Salary" Type="Int32" Nullable="false" />
+          <Property Name="SalaryURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TL1" Type="Int32" Nullable="false" />
+          <Property Name="TL2" Type="Int32" Nullable="false" />
+          <Property Name="TL3" Type="Int32" Nullable="false" />
+          <Property Name="TL4" Type="Int32" Nullable="false" />
+          <Property Name="TL5" Type="Int32" Nullable="false" />
+          <Property Name="TL6" Type="Int32" Nullable="false" />
+          <Property Name="ELLEVEL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="C" Type="Int32" Nullable="false" />
+          <Property Name="E" Type="Int32" Nullable="false" />
+          <Property Name="M" Type="Int32" Nullable="false" />
+          <Property Name="S" Type="Int32" Nullable="false" />
+          <Property Name="N" Type="Int32" Nullable="false" />
+          <Property Name="T" Type="Int32" Nullable="false" />
+          <Property Name="CE" Type="Int32" Nullable="false" />
+          <Property Name="CM" Type="Int32" Nullable="false" />
+          <Property Name="CS" Type="Int32" Nullable="false" />
+          <Property Name="CN" Type="Int32" Nullable="false" />
+          <Property Name="CT" Type="Int32" Nullable="false" />
+          <Property Name="EM" Type="Int32" Nullable="false" />
+          <Property Name="ES" Type="Int32" Nullable="false" />
+          <Property Name="EN" Type="Int32" Nullable="false" />
+          <Property Name="ET" Type="Int32" Nullable="false" />
+          <Property Name="MS" Type="Int32" Nullable="false" />
+          <Property Name="MN" Type="Int32" Nullable="false" />
+          <Property Name="MT" Type="Int32" Nullable="false" />
+          <Property Name="SN" Type="Int32" Nullable="false" />
+          <Property Name="ST" Type="Int32" Nullable="false" />
+          <Property Name="NT" Type="Int32" Nullable="false" />
+          <Property Name="CEM" Type="Int32" Nullable="false" />
+          <Property Name="CES" Type="Int32" Nullable="false" />
+          <Property Name="CEN" Type="Int32" Nullable="false" />
+          <Property Name="CET" Type="Int32" Nullable="false" />
+          <Property Name="CMS" Type="Int32" Nullable="false" />
+          <Property Name="CMN" Type="Int32" Nullable="false" />
+          <Property Name="CMT" Type="Int32" Nullable="false" />
+          <Property Name="CSN" Type="Int32" Nullable="false" />
+          <Property Name="CST" Type="Int32" Nullable="false" />
+          <Property Name="CNT" Type="Int32" Nullable="false" />
+          <Property Name="EMS" Type="Int32" Nullable="false" />
+          <Property Name="EMN" Type="Int32" Nullable="false" />
+          <Property Name="EMT" Type="Int32" Nullable="false" />
+          <Property Name="ESN" Type="Int32" Nullable="false" />
+          <Property Name="EST" Type="Int32" Nullable="false" />
+          <Property Name="ENT" Type="Int32" Nullable="false" />
+          <Property Name="MSN" Type="Int32" Nullable="false" />
+          <Property Name="MST" Type="Int32" Nullable="false" />
+          <Property Name="MNT" Type="Int32" Nullable="false" />
+          <Property Name="SNT" Type="Int32" Nullable="false" />
+          <Property Name="CEMS" Type="Int32" Nullable="false" />
+          <Property Name="CEMN" Type="Int32" Nullable="false" />
+          <Property Name="CEMT" Type="Int32" Nullable="false" />
+          <Property Name="CESN" Type="Int32" Nullable="false" />
+          <Property Name="CEST" Type="Int32" Nullable="false" />
+          <Property Name="CENT" Type="Int32" Nullable="false" />
+          <Property Name="CMSN" Type="Int32" Nullable="false" />
+          <Property Name="CMST" Type="Int32" Nullable="false" />
+          <Property Name="CMNT" Type="Int32" Nullable="false" />
+          <Property Name="CSNT" Type="Int32" Nullable="false" />
+          <Property Name="EMSN" Type="Int32" Nullable="false" />
+          <Property Name="EMST" Type="Int32" Nullable="false" />
+          <Property Name="EMNT" Type="Int32" Nullable="false" />
+          <Property Name="ESNT" Type="Int32" Nullable="false" />
+          <Property Name="MSNT" Type="Int32" Nullable="false" />
+          <Property Name="CEMSN" Type="Int32" Nullable="false" />
+          <Property Name="CEMST" Type="Int32" Nullable="false" />
+          <Property Name="CEMNT" Type="Int32" Nullable="false" />
+          <Property Name="CESNT" Type="Int32" Nullable="false" />
+          <Property Name="CMSNT" Type="Int32" Nullable="false" />
+          <Property Name="EMSNT" Type="Int32" Nullable="false" />
+          <Property Name="CEMSNT" Type="Int32" Nullable="false" />
+          <Property Name="City" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Change" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="lastCriterion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="rateOfThisYear" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ExamURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="DCs" Relationship="Self.FK_DC_D" FromRole="D" ToRole="DC" />
+        </EntityType>
+        <EntityType Name="DC">
+          <Key>
+            <PropertyRef Name="DID" />
+            <PropertyRef Name="Cname" />
+          </Key>
+          <Property Name="DID" Type="Int32" Nullable="false" />
+          <Property Name="Cname" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="D" Relationship="Self.FK_DC_D" FromRole="DC" ToRole="D" />
+        </EntityType>
+        <EntityType Name="NewScoreData">
+          <Key>
+            <PropertyRef Name="Ename" />
+            <PropertyRef Name="Score" />
+          </Key>
+          <Property Name="Ename" Type="String" MaxLength="6" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Score" Type="Int32" Nullable="false" />
+          <Property Name="Percentage" Type="Double" Nullable="false" />
+        </EntityType>
+        <EntityType Name="OldScoreData">
+          <Key>
+            <PropertyRef Name="Ename" />
+            <PropertyRef Name="Score" />
+          </Key>
+          <Property Name="Ename" Type="String" MaxLength="6" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Score" Type="Int32" Nullable="false" />
+          <Property Name="Percentage" Type="Double" Nullable="false" />
+        </EntityType>
+        <EntityType Name="T">
+          <Key>
+            <PropertyRef Name="TName" />
+          </Key>
+          <Property Name="TName" Type="String" MaxLength="6" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="Grade1" Type="Int32" Nullable="false" />
+          <Property Name="Grade2" Type="Int32" Nullable="false" />
+          <Property Name="Grade3" Type="Int32" Nullable="false" />
+          <Property Name="Grade4" Type="Int32" Nullable="false" />
+          <Property Name="Grade5" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_DC_D">
+          <End Role="D" Type="Self.D" Multiplicity="1" />
+          <End Role="DC" Type="Self.DC" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="D">
+              <PropertyRef Name="DID" />
+            </Principal>
+            <Dependent Role="DC">
+              <PropertyRef Name="DID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="GSAT_Prediction_2017Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CGs" EntityType="Self.CG" />
+          <EntitySet Name="D" EntityType="Self.D" />
+          <EntitySet Name="DCs" EntityType="Self.DC" />
+          <EntitySet Name="NewScoreDatas" EntityType="Self.NewScoreData" />
+          <EntitySet Name="OldScoreDatas" EntityType="Self.OldScoreData" />
+          <EntitySet Name="T" EntityType="Self.T" />
+          <AssociationSet Name="FK_DC_D" Association="Self.FK_DC_D">
+            <End Role="D" EntitySet="D" />
+            <End Role="DC" EntitySet="DCs" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="GSAT_Prediction_2017ModelStoreContainer" CdmEntityContainer="GSAT_Prediction_2017Entities">
+          <EntitySetMapping Name="CGs">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.CG">
+              <MappingFragment StoreEntitySet="CG">
+                <ScalarProperty Name="Cname" ColumnName="Cname" />
+                <ScalarProperty Name="Gname" ColumnName="Gname" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="D">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.D">
+              <MappingFragment StoreEntitySet="D">
+                <ScalarProperty Name="DID" ColumnName="DID" />
+                <ScalarProperty Name="UName" ColumnName="UName" />
+                <ScalarProperty Name="UURL" ColumnName="UURL" />
+                <ScalarProperty Name="DName" ColumnName="DName" />
+                <ScalarProperty Name="DURL" ColumnName="DURL" />
+                <ScalarProperty Name="Salary" ColumnName="Salary" />
+                <ScalarProperty Name="SalaryURL" ColumnName="SalaryURL" />
+                <ScalarProperty Name="TL1" ColumnName="TL1" />
+                <ScalarProperty Name="TL2" ColumnName="TL2" />
+                <ScalarProperty Name="TL3" ColumnName="TL3" />
+                <ScalarProperty Name="TL4" ColumnName="TL4" />
+                <ScalarProperty Name="TL5" ColumnName="TL5" />
+                <ScalarProperty Name="TL6" ColumnName="TL6" />
+                <ScalarProperty Name="ELLEVEL" ColumnName="ELLEVEL" />
+                <ScalarProperty Name="C" ColumnName="C" />
+                <ScalarProperty Name="E" ColumnName="E" />
+                <ScalarProperty Name="M" ColumnName="M" />
+                <ScalarProperty Name="S" ColumnName="S" />
+                <ScalarProperty Name="N" ColumnName="N" />
+                <ScalarProperty Name="T" ColumnName="T" />
+                <ScalarProperty Name="CE" ColumnName="CE" />
+                <ScalarProperty Name="CM" ColumnName="CM" />
+                <ScalarProperty Name="CS" ColumnName="CS" />
+                <ScalarProperty Name="CN" ColumnName="CN" />
+                <ScalarProperty Name="CT" ColumnName="CT" />
+                <ScalarProperty Name="EM" ColumnName="EM" />
+                <ScalarProperty Name="ES" ColumnName="ES" />
+                <ScalarProperty Name="EN" ColumnName="EN" />
+                <ScalarProperty Name="ET" ColumnName="ET" />
+                <ScalarProperty Name="MS" ColumnName="MS" />
+                <ScalarProperty Name="MN" ColumnName="MN" />
+                <ScalarProperty Name="MT" ColumnName="MT" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ST" ColumnName="ST" />
+                <ScalarProperty Name="NT" ColumnName="NT" />
+                <ScalarProperty Name="CEM" ColumnName="CEM" />
+                <ScalarProperty Name="CES" ColumnName="CES" />
+                <ScalarProperty Name="CEN" ColumnName="CEN" />
+                <ScalarProperty Name="CET" ColumnName="CET" />
+                <ScalarProperty Name="CMS" ColumnName="CMS" />
+                <ScalarProperty Name="CMN" ColumnName="CMN" />
+                <ScalarProperty Name="CMT" ColumnName="CMT" />
+                <ScalarProperty Name="CSN" ColumnName="CSN" />
+                <ScalarProperty Name="CST" ColumnName="CST" />
+                <ScalarProperty Name="CNT" ColumnName="CNT" />
+                <ScalarProperty Name="EMS" ColumnName="EMS" />
+                <ScalarProperty Name="EMN" ColumnName="EMN" />
+                <ScalarProperty Name="EMT" ColumnName="EMT" />
+                <ScalarProperty Name="ESN" ColumnName="ESN" />
+                <ScalarProperty Name="EST" ColumnName="EST" />
+                <ScalarProperty Name="ENT" ColumnName="ENT" />
+                <ScalarProperty Name="MSN" ColumnName="MSN" />
+                <ScalarProperty Name="MST" ColumnName="MST" />
+                <ScalarProperty Name="MNT" ColumnName="MNT" />
+                <ScalarProperty Name="SNT" ColumnName="SNT" />
+                <ScalarProperty Name="CEMS" ColumnName="CEMS" />
+                <ScalarProperty Name="CEMN" ColumnName="CEMN" />
+                <ScalarProperty Name="CEMT" ColumnName="CEMT" />
+                <ScalarProperty Name="CESN" ColumnName="CESN" />
+                <ScalarProperty Name="CEST" ColumnName="CEST" />
+                <ScalarProperty Name="CENT" ColumnName="CENT" />
+                <ScalarProperty Name="CMSN" ColumnName="CMSN" />
+                <ScalarProperty Name="CMST" ColumnName="CMST" />
+                <ScalarProperty Name="CMNT" ColumnName="CMNT" />
+                <ScalarProperty Name="CSNT" ColumnName="CSNT" />
+                <ScalarProperty Name="EMSN" ColumnName="EMSN" />
+                <ScalarProperty Name="EMST" ColumnName="EMST" />
+                <ScalarProperty Name="EMNT" ColumnName="EMNT" />
+                <ScalarProperty Name="ESNT" ColumnName="ESNT" />
+                <ScalarProperty Name="MSNT" ColumnName="MSNT" />
+                <ScalarProperty Name="CEMSN" ColumnName="CEMSN" />
+                <ScalarProperty Name="CEMST" ColumnName="CEMST" />
+                <ScalarProperty Name="CEMNT" ColumnName="CEMNT" />
+                <ScalarProperty Name="CESNT" ColumnName="CESNT" />
+                <ScalarProperty Name="CMSNT" ColumnName="CMSNT" />
+                <ScalarProperty Name="EMSNT" ColumnName="EMSNT" />
+                <ScalarProperty Name="CEMSNT" ColumnName="CEMSNT" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="PP" ColumnName="PP" />
+                <ScalarProperty Name="Change" ColumnName="Change" />
+                <ScalarProperty Name="lastCriterion" ColumnName="lastCriterion" />
+                <ScalarProperty Name="rateOfThisYear" ColumnName="rateOfThisYear" />
+                <ScalarProperty Name="ExamURL" ColumnName="ExamURL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DCs">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.DC">
+              <MappingFragment StoreEntitySet="DC">
+                <ScalarProperty Name="DID" ColumnName="DID" />
+                <ScalarProperty Name="Cname" ColumnName="Cname" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NewScoreDatas">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.NewScoreData">
+              <MappingFragment StoreEntitySet="NewScoreData">
+                <ScalarProperty Name="Ename" ColumnName="Ename" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+                <ScalarProperty Name="Percentage" ColumnName="Percentage" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OldScoreDatas">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.OldScoreData">
+              <MappingFragment StoreEntitySet="OldScoreData">
+                <ScalarProperty Name="Ename" ColumnName="Ename" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+                <ScalarProperty Name="Percentage" ColumnName="Percentage" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="T">
+            <EntityTypeMapping TypeName="GSAT_Prediction_2017Model.T">
+              <MappingFragment StoreEntitySet="T">
+                <ScalarProperty Name="TName" ColumnName="TName" />
+                <ScalarProperty Name="Grade1" ColumnName="Grade1" />
+                <ScalarProperty Name="Grade2" ColumnName="Grade2" />
+                <ScalarProperty Name="Grade3" ColumnName="Grade3" />
+                <ScalarProperty Name="Grade4" ColumnName="Grade4" />
+                <ScalarProperty Name="Grade5" ColumnName="Grade5" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

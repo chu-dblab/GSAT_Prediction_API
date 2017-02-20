@@ -93,6 +93,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Models\GSAT_Prediction_2017.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>GSAT_Prediction_2017.edmx</DependentUpon>
+      <LastGenOutput>GSAT_Prediction_2017.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\GSAT_Prediction_2017.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>GSAT_Prediction_2017.edmx</DependentUpon>
+      <LastGenOutput>GSAT_Prediction_2017.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -101,12 +111,53 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CG.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\D.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DataOperation.cs" />
+    <Compile Include="Models\DC.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GSAT_Prediction_2017.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GSAT_Prediction_2017.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GSAT_Prediction_2017.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GSAT_Prediction_2017.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GSAT_Prediction_2017.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NewScoreData.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OldScoreData.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\PredictionData.cs" />
+    <Compile Include="Models\T.cs">
+      <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <EntityDeploy Include="Models\GSAT_Prediction_2017.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>GSAT_Prediction_2017.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\GSAT_Prediction_2017.edmx.diagram">
+      <DependentUpon>GSAT_Prediction_2017.edmx</DependentUpon>
+    </Content>
+    <None Include="Properties\PublishProfiles\GSATPrediction.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

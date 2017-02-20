@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -8,11 +9,11 @@ namespace PredictionAPI.Models
 {
     public class Gsat
     {
-        public int Chinese { get; set; }
-        public int English { get; set; }
-        public int Math { get; set; }
-        public int Science { get; set; }
-        public int Society { get; set; }
+        public string Chinese { get; set; }
+        public string English { get; set; }
+        public string Math { get; set; }
+        public string Science { get; set; }
+        public string Society { get; set; }
         public string EngListeningLevel { get; set; }
     }
 
@@ -26,7 +27,7 @@ namespace PredictionAPI.Models
         public Grades grades { get; set; }
         public List<string> groups { get; set; }
         public List<string> location { get; set; }
-        public string property { get; set; }
+        public List<string> property { get; set; }
         public int expect_salary { get; set; }
     }
 

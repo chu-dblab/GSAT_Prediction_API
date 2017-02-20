@@ -15,37 +15,91 @@ namespace GSATPrediction.Controllers
     public class GSATController : ApiController
     {
         private StandarLevel level = new StandarLevel();
+        private DataOperation op;
 
         [HttpPost]
         public HttpResponseMessage aquireAllSubjectStandar([FromBody]JObject point)
         {
-            Enter input = JsonConvert.DeserializeObject<Enter>(point.ToString());
-            
-            //查學測成績的標準
-            DataOperation op = new DataOperation();
-            ArrayList list = op.changeScoreOfGSAT2Level(input.grades.gsat);
-
-            //轉換成人可以看的標準
-            string[] judge = {"底標", "後標", "均標", "前標", "頂標" };
-            string[] subject = {"國文", "英文", "數學", "自然", "社會", "總級分"};
-            Dictionary<string, string> standar = new Dictionary<string, string>();
-            for (int i=0;i<list.Count;i++)
+            try
             {
-                standar.Add(subject[i], judge[Convert.ToInt32(list[i])]);
+                Enter input = JsonConvert.DeserializeObject<Enter>(point.ToString());
+
+                //查學測成績的標準
+                op = new DataOperation();
+                ArrayList list = op.changeScoreOfGSAT2Level(input.grades.gsat);
+
+                //轉換成人可以看的標準
+                string[] judge = { "未達標","底標", "後標", "均標", "前標", "頂標" };
+                string[] subject = { "Chinese", "English", "Math", "Science", "Society", "TotalScore" };
+                Dictionary<string, string> standar = new Dictionary<string, string>();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    standar.Add(subject[i], judge[Convert.ToInt32(list[i])]);
+                }
+
+                //塞資料
+                level.enter = input;
+                level.status = Convert.ToInt32(HttpStatusCode.OK);
+                level.step = standar;
+
+                //轉JSON
+                JObject jsonData = JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(level));
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ObjectContent<JObject>(jsonData, new JsonMediaTypeFormatter())
+                };
+                return result;
+            }
+            catch(Exception ex)
+            {
+                var result = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new ObjectContent<JObject>(
+                       new JObject(
+                       new JProperty("status", HttpStatusCode.BadRequest),
+                       new JProperty("input", point),
+                       new JProperty("Message", "解析錯誤~!!")), new JsonMediaTypeFormatter())
+                };
+                return result;
+            }
+            
+            
+        }
+
+        [HttpPost]
+        public HttpResponseMessage analysis([FromBody] JObject data)
+        {
+            try
+            {
+                Input obj = JsonConvert.DeserializeObject<Input>(data.ToString());
+                op = new DataOperation();
+                List<PredictionResult> list = op.SearchResult(obj);
+                Output rootData = new Output();
+                rootData.status = Convert.ToInt32(HttpStatusCode.OK);
+                rootData.input = obj;
+                rootData.result = list;
+                rootData.message = "Success~!!";
+                JObject jsonData = JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(rootData));
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ObjectContent<JObject>(jsonData, new JsonMediaTypeFormatter())
+                };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var result = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new ObjectContent<JObject>(
+                       new JObject(
+                       new JProperty("status", HttpStatusCode.BadRequest),
+                       new JProperty("input", data),
+                       new JProperty("Message", "解析錯誤~!!")), new JsonMediaTypeFormatter())
+                };
+                return result;
             }
 
-            //塞資料
-            level.enter = input;
-            level.status = Convert.ToInt32(HttpStatusCode.OK);
-            level.step = standar;
-            
-            //轉JSON
-            JObject jsonData = JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(level));
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ObjectContent<JObject>(jsonData, new JsonMediaTypeFormatter())
-            };
-            return result;
+            return null;
         }
     }
 }
