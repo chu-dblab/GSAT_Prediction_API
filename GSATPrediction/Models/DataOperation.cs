@@ -169,12 +169,7 @@ namespace PredictionAPI.Models
             string group = appendData(groups);
             string city = appendData(cities);
             string attribute = appendData(attributes);
-            string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP," +
-                "D.C,D.E,D.M,D.N,D.S,D.T,D.C,D.E,D.M,D.S,D.N,D.T,"+
-                "D.CE,D.CM,D.CS,D.CN,D.CT,D.EM,D.ES,D.EN,D.ET,D.MS,D.MN,D.MT,D.SN,D.ST,D.NT,"+
-                "D.CEM,D.CES,D.CEN,D.CET,D.CMS,D.CMN,D.CMT,D.CSN,D.CST,D.CNT,D.EMS,D.EMN,D.EMT,D.ESN,D.EST,D.ENT,D.MSN,D.MST,D.MNT,D.SNT,"+
-                "D.CEMS,D.CEMN,D.CEMT,D.CESN,D.CEST,D.CENT,D.CMSN,D.CMST,D.CMNT,D.CSNT,D.EMSN,D.EMST,D.EMNT,D.ESNT,D.MSNT,"+
-                "D.CEMSN,D.CEMST,D.CEMNT,D.CESNT,D.CMSNT,D.EMSNT,D.CEMSNT" +
+            string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP" +               
                 " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND D.City IN (" + city + ") " +
                     "AND D.ELLEVEL >= '" + EL + "' "+"AND D.PP IN ("+ attribute + ") "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
@@ -211,7 +206,9 @@ namespace PredictionAPI.Models
                    " AND D.MSNT <= " + Convert.ToString(oldScore["OMSNT"] + 1) + " AND D.CEMSN <= " + Convert.ToString(oldScore["OCEMSN"] + 1) +
                    " AND D.CEMST <= " + Convert.ToString(oldScore["OCEMST"] + 1) + " AND D.CEMNT <= " + Convert.ToString(oldScore["OCEMNT"] + 1) +
                    " AND D.CESNT <= " + Convert.ToString(oldScore["OCESNT"] + 1) + " AND D.CMSNT <= " + Convert.ToString(oldScore["OCMSNT"] + 1) +
-                   " AND D.EMSNT <= " + Convert.ToString(oldScore["OEMSNT"] + 1) + " AND D.CEMSNT <= " + Convert.ToString(oldScore["OCEMSNT"] + 1) + " OR D.UName = '中華大學'"+
+                   " AND D.EMSNT <= " + Convert.ToString(oldScore["OEMSNT"] + 1) + " AND D.CEMSNT <= " + Convert.ToString(oldScore["OCEMSNT"] + 1) +
+                   " UNION SELECT DISTINCT  D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP FROM  D,DC,CG "+
+                   "WHERE D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND D.UName = '中華大學'"+
                    " ORDER BY D.Salary DESC;";
             return command;
         }
@@ -241,69 +238,69 @@ namespace PredictionAPI.Models
             score.Add("T", score["C"] + score["E"] + score["M"] + score["N"] + score["S"]);
             foreach (var school in originalData)
             {
-                if (score["C"] != 0 && (score["C"] - scoreData["國文"]) > 0) school.riskIndex = true;
-                if (score["E"] != 0 && (score["E"] - scoreData["英文"]) > 0) school.riskIndex = true;
-                if (score["M"] != 0 && (score["M"] - scoreData["數學"]) > 0) school.riskIndex = true;
-                if (score["S"] != 0 && (score["S"] - scoreData["社會"]) > 0) school.riskIndex = true;
-                if (score["N"] != 0 && (score["N"] - scoreData["自然"]) > 0) school.riskIndex = true;
-                if (score["T"] != 0 && (score["T"] - scoreData["總級分"]) > 0) school.riskIndex = true;
-                if ((score["C"] + score["E"]) != 0 && (score["C"] + score["E"] - scoreData["OCE"]) > 0) school.riskIndex = true;
-                if ((score["C"] + score["M"]) != 0 && (score["C"] + score["M"] - scoreData["OCM"]) > 0) school.riskIndex = true;
-                if ((score["C"] + score["S"]) != 0 && (score["C"] + score["S"] - scoreData["OCS"]) > 0) school.riskIndex = true;
-                if ((score["C"] + score["N"]) != 0 && (score["C"] + score["N"] - scoreData["OCN"]) > 0) school.riskIndex = true;
-                if ((score["C"] + score["T"]) != 0 && (score["C"] + score["T"] - scoreData["OCT"]) > 0) school.riskIndex = true;
-                if ((score["E"] + score["M"]) != 0 && (score["E"] + score["M"] - scoreData["OEM"]) > 0) school.riskIndex = true;
-                if ((score["E"] + score["S"]) != 0 && (score["E"] + score["S"] - scoreData["OES"]) > 0) school.riskIndex = true;
-                if ((score["E"] + score["N"]) != 0 && (score["E"] + score["N"] - scoreData["OEN"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["T"]) != 0 && (score["E"] + score["T"] - scoreData["OET"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) != 0 && (score["M"] + score["S"] - scoreData["OMS"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["N"]) != 0 && (score["M"] + score["N"] - scoreData["OMN"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["T"]) != 0 && (score["M"] + score["T"] - scoreData["OMT"]) > 0) school.riskIndex = true;
-               if ((score["S"] + score["N"]) != 0 && (score["S"] + score["N"] - scoreData["OSN"]) > 0) school.riskIndex = true;
-               if ((score["S"] + score["T"]) != 0 && (score["S"] + score["T"] - scoreData["OST"]) > 0) school.riskIndex = true;
-               if ((score["N"] + score["T"]) != 0 && (score["N"] + score["T"] - scoreData["ONT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] != 0 && (score["C"] + score["E"] + score["M"] - scoreData["OCEM"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] != 0 && (score["C"] + score["E"] + score["S"] - scoreData["OCES"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["N"] != 0 && (score["C"] + score["E"] + score["N"] - scoreData["OCEN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["T"] != 0 && (score["C"] + score["E"] + score["T"] - scoreData["OCET"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] != 0 && (score["C"] + score["M"] + score["S"] - scoreData["OCMS"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["N"] != 0 && (score["C"] + score["M"] + score["N"] - scoreData["OCMN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["T"] != 0 && (score["C"] + score["M"] + score["T"] - scoreData["OCMT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["N"] != 0 && (score["C"] + score["S"] + score["N"] - scoreData["OCSN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["T"] != 0 && (score["C"] + score["S"] + score["T"] - scoreData["OCST"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["N"]) + score["T"] != 0 && (score["C"] + score["N"] + score["T"] - scoreData["OCNT"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] != 0 && (score["E"] + score["M"] + score["S"] - scoreData["OEMS"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["N"] != 0 && (score["E"] + score["M"] + score["N"] - scoreData["OEMN"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["T"] != 0 && (score["E"] + score["M"] + score["T"] - scoreData["OEMT"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["N"] != 0 && (score["E"] + score["S"] + score["N"] - scoreData["OESN"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["T"] != 0 && (score["E"] + score["S"] + score["T"] - scoreData["OEST"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["N"]) + score["T"] != 0 && (score["E"] + score["N"] + score["T"] - scoreData["OENT"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["N"] != 0 && (score["M"] + score["S"] + score["N"] - scoreData["OMSN"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["T"] != 0 && (score["M"] + score["S"] + score["T"] - scoreData["OMST"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["N"]) + score["T"] != 0 && (score["M"] + score["N"] + score["T"] - scoreData["OMNT"]) > 0) school.riskIndex = true;
-               if ((score["S"] + score["N"]) + score["T"] != 0 && (score["S"] + score["N"] + score["T"] - scoreData["OSNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] - scoreData["OCEMS"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] - scoreData["OCEMN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["T"] - scoreData["OCEMT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] - scoreData["OCESN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["T"] - scoreData["OCEST"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["N"] + score["T"] - scoreData["OCENT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["N"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] - scoreData["OCMSN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["T"] - scoreData["OCMST"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["N"] + score["T"] - scoreData["OCMNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["N"] + score["T"] != 0 && (score["C"] + score["S"] + score["N"] + score["T"] - scoreData["OCSNT"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["N"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OEMSN"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OEMST"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OEMNT"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["N"] + score["T"] != 0 && (score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OESNT"]) > 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["N"] + score["T"] != 0 && (score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OMSNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OCEMSN"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OCEMST"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OCEMNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OCESNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCMSNT"]) > 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OEMSNT"]) > 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCEMSNT"]) > 0) school.riskIndex = true;
+                if (score["C"] != 0 && (score["C"] - scoreData["國文"]) < 0) school.riskIndex = true;
+                if (score["E"] != 0 && (score["E"] - scoreData["英文"]) < 0) school.riskIndex = true;
+                if (score["M"] != 0 && (score["M"] - scoreData["數學"]) < 0) school.riskIndex = true;
+                if (score["S"] != 0 && (score["S"] - scoreData["社會"]) < 0) school.riskIndex = true;
+                if (score["N"] != 0 && (score["N"] - scoreData["自然"]) < 0) school.riskIndex = true;
+                if (score["T"] != 0 && (score["T"] - scoreData["總級分"]) < 0) school.riskIndex = true;
+                if ((score["C"] + score["E"]) != 0 && (score["C"] + score["E"] - scoreData["OCE"]) < 0) school.riskIndex = true;
+                if ((score["C"] + score["M"]) != 0 && (score["C"] + score["M"] - scoreData["OCM"]) < 0) school.riskIndex = true;
+                if ((score["C"] + score["S"]) != 0 && (score["C"] + score["S"] - scoreData["OCS"]) < 0) school.riskIndex = true;
+                if ((score["C"] + score["N"]) != 0 && (score["C"] + score["N"] - scoreData["OCN"]) < 0) school.riskIndex = true;
+                if ((score["C"] + score["T"]) != 0 && (score["C"] + score["T"] - scoreData["OCT"]) < 0) school.riskIndex = true;
+                if ((score["E"] + score["M"]) != 0 && (score["E"] + score["M"] - scoreData["OEM"]) < 0) school.riskIndex = true;
+                if ((score["E"] + score["S"]) != 0 && (score["E"] + score["S"] - scoreData["OES"]) < 0) school.riskIndex = true;
+                if ((score["E"] + score["N"]) != 0 && (score["E"] + score["N"] - scoreData["OEN"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["T"]) != 0 && (score["E"] + score["T"] - scoreData["OET"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["S"]) != 0 && (score["M"] + score["S"] - scoreData["OMS"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["N"]) != 0 && (score["M"] + score["N"] - scoreData["OMN"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["T"]) != 0 && (score["M"] + score["T"] - scoreData["OMT"]) < 0) school.riskIndex = true;
+               if ((score["S"] + score["N"]) != 0 && (score["S"] + score["N"] - scoreData["OSN"]) < 0) school.riskIndex = true;
+               if ((score["S"] + score["T"]) != 0 && (score["S"] + score["T"] - scoreData["OST"]) < 0) school.riskIndex = true;
+               if ((score["N"] + score["T"]) != 0 && (score["N"] + score["T"] - scoreData["ONT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] != 0 && (score["C"] + score["E"] + score["M"] - scoreData["OCEM"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["S"] != 0 && (score["C"] + score["E"] + score["S"] - scoreData["OCES"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["N"] != 0 && (score["C"] + score["E"] + score["N"] - scoreData["OCEN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["T"] != 0 && (score["C"] + score["E"] + score["T"] - scoreData["OCET"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["S"] != 0 && (score["C"] + score["M"] + score["S"] - scoreData["OCMS"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["N"] != 0 && (score["C"] + score["M"] + score["N"] - scoreData["OCMN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["T"] != 0 && (score["C"] + score["M"] + score["T"] - scoreData["OCMT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["S"]) + score["N"] != 0 && (score["C"] + score["S"] + score["N"] - scoreData["OCSN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["S"]) + score["T"] != 0 && (score["C"] + score["S"] + score["T"] - scoreData["OCST"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["N"]) + score["T"] != 0 && (score["C"] + score["N"] + score["T"] - scoreData["OCNT"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["S"] != 0 && (score["E"] + score["M"] + score["S"] - scoreData["OEMS"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["N"] != 0 && (score["E"] + score["M"] + score["N"] - scoreData["OEMN"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["T"] != 0 && (score["E"] + score["M"] + score["T"] - scoreData["OEMT"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["S"]) + score["N"] != 0 && (score["E"] + score["S"] + score["N"] - scoreData["OESN"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["S"]) + score["T"] != 0 && (score["E"] + score["S"] + score["T"] - scoreData["OEST"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["N"]) + score["T"] != 0 && (score["E"] + score["N"] + score["T"] - scoreData["OENT"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["S"]) + score["N"] != 0 && (score["M"] + score["S"] + score["N"] - scoreData["OMSN"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["S"]) + score["T"] != 0 && (score["M"] + score["S"] + score["T"] - scoreData["OMST"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["N"]) + score["T"] != 0 && (score["M"] + score["N"] + score["T"] - scoreData["OMNT"]) < 0) school.riskIndex = true;
+               if ((score["S"] + score["N"]) + score["T"] != 0 && (score["S"] + score["N"] + score["T"] - scoreData["OSNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["S"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] - scoreData["OCEMS"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] - scoreData["OCEMN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["T"] - scoreData["OCEMT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] - scoreData["OCESN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["T"] - scoreData["OCEST"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["N"] + score["T"] - scoreData["OCENT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["S"] + score["N"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] - scoreData["OCMSN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["S"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["T"] - scoreData["OCMST"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["N"] + score["T"] - scoreData["OCMNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["S"]) + score["N"] + score["T"] != 0 && (score["C"] + score["S"] + score["N"] + score["T"] - scoreData["OCSNT"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["S"] + score["N"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OEMSN"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["S"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OEMST"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OEMNT"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["S"]) + score["N"] + score["T"] != 0 && (score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OESNT"]) < 0) school.riskIndex = true;
+               if ((score["M"] + score["S"]) + score["N"] + score["T"] != 0 && (score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OMSNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OCEMSN"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OCEMST"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OCEMNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OCESNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCMSNT"]) < 0) school.riskIndex = true;
+               if ((score["E"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OEMSNT"]) < 0) school.riskIndex = true;
+               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCEMSNT"]) < 0) school.riskIndex = true;
             }
             return originalData;
         }
