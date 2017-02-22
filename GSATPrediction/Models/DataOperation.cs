@@ -169,9 +169,14 @@ namespace PredictionAPI.Models
             string group = appendData(groups);
             string city = appendData(cities);
             string attribute = appendData(attributes);
-            string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP" +               
-                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND D.City IN (" + city + ") " +
-                    "AND D.ELLEVEL >= '" + EL + "' "+"AND D.PP IN ("+ attribute + ") "+"AND D.TL1 <= " + level[0].ToString() + 
+            string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP," +
+                "D.C,D.E,D.M,D.S,D.N,D.T,"+
+                "D.CE,D.CM,D.CS,D.CN,D.CT,D.EM,D.ES,D.EN,D.ET,D.MS,D.MN,D.MT,D.SN,D.ST,D.NT,"+
+                "D.CEM,D.CES,D.CEN,D.CET,D.CMS,D.CMN,D.CMT,D.CSN,D.CST,D.CNT,D.EMS,D.EMN,D.EMT,D.ESN,D.EST,D.ENT,D.MSN,D.MST,D.MNT,D.SNT,"+
+                "D.CEMS,D.CEMN,D.CEMT,D.CESN,D.CEST,D.CENT,D.CMSN,D.CMST,D.CMNT,D.CSNT,D.EMSN,D.EMST,D.EMNT,D.ESNT,D.MSNT,"+
+                "D.CEMSN,D.CEMST,D.CEMNT,D.CESNT,D.CMSNT,D.EMSNT,D.CEMSNT" +             
+                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND ((D.City IN (" + city + ") "+"AND D.PP IN (" + attribute + ")) "+ "OR D.UName = '中華大學')" +
+                    " AND D.ELLEVEL >= '" + EL + "' "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
                     " AND D.TL4 <= " + level[3].ToString() + " AND D.TL5 <= " + level[4].ToString() +
                     " AND D.TL6 <= " + level[5].ToString() + " AND D.Salary >= " + expectedSalary.ToString() +
@@ -207,8 +212,6 @@ namespace PredictionAPI.Models
                    " AND D.CEMST <= " + Convert.ToString(oldScore["OCEMST"] + 1) + " AND D.CEMNT <= " + Convert.ToString(oldScore["OCEMNT"] + 1) +
                    " AND D.CESNT <= " + Convert.ToString(oldScore["OCESNT"] + 1) + " AND D.CMSNT <= " + Convert.ToString(oldScore["OCMSNT"] + 1) +
                    " AND D.EMSNT <= " + Convert.ToString(oldScore["OEMSNT"] + 1) + " AND D.CEMSNT <= " + Convert.ToString(oldScore["OCEMSNT"] + 1) +
-                   " UNION SELECT DISTINCT  D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP FROM  D,DC,CG "+
-                   "WHERE D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND D.UName = '中華大學'"+
                    " ORDER BY D.Salary DESC;";
             return command;
         }
@@ -227,80 +230,77 @@ namespace PredictionAPI.Models
             return temp;
         }
 
-        private List<PredictionResult> computeRisk(List<PredictionResult> originalData, Gsat grade, Dictionary<string, int> scoreData)
+        private List<PredictionResult> computeRisk(List<PredictionResult> originalData, DataTable filter, Dictionary<string, int> scoreData)
         {
-            Dictionary<string, int> score = new Dictionary<string, int>();
-            score.Add("C", Convert.ToInt32(grade.Chinese));
-            score.Add("E", Convert.ToInt32(grade.English));
-            score.Add("M", Convert.ToInt32(grade.Math));
-            score.Add("N", Convert.ToInt32(grade.Science));
-            score.Add("S", Convert.ToInt32(grade.Society));
-            score.Add("T", score["C"] + score["E"] + score["M"] + score["N"] + score["S"]);
-            foreach (var school in originalData)
+            for(int i=0;i< originalData.Count;i++)
             {
-                if (score["C"] != 0 && (score["C"] - scoreData["國文"]) < 0) school.riskIndex = true;
-                if (score["E"] != 0 && (score["E"] - scoreData["英文"]) < 0) school.riskIndex = true;
-                if (score["M"] != 0 && (score["M"] - scoreData["數學"]) < 0) school.riskIndex = true;
-                if (score["S"] != 0 && (score["S"] - scoreData["社會"]) < 0) school.riskIndex = true;
-                if (score["N"] != 0 && (score["N"] - scoreData["自然"]) < 0) school.riskIndex = true;
-                if (score["T"] != 0 && (score["T"] - scoreData["總級分"]) < 0) school.riskIndex = true;
-                if ((score["C"] + score["E"]) != 0 && (score["C"] + score["E"] - scoreData["OCE"]) < 0) school.riskIndex = true;
-                if ((score["C"] + score["M"]) != 0 && (score["C"] + score["M"] - scoreData["OCM"]) < 0) school.riskIndex = true;
-                if ((score["C"] + score["S"]) != 0 && (score["C"] + score["S"] - scoreData["OCS"]) < 0) school.riskIndex = true;
-                if ((score["C"] + score["N"]) != 0 && (score["C"] + score["N"] - scoreData["OCN"]) < 0) school.riskIndex = true;
-                if ((score["C"] + score["T"]) != 0 && (score["C"] + score["T"] - scoreData["OCT"]) < 0) school.riskIndex = true;
-                if ((score["E"] + score["M"]) != 0 && (score["E"] + score["M"] - scoreData["OEM"]) < 0) school.riskIndex = true;
-                if ((score["E"] + score["S"]) != 0 && (score["E"] + score["S"] - scoreData["OES"]) < 0) school.riskIndex = true;
-                if ((score["E"] + score["N"]) != 0 && (score["E"] + score["N"] - scoreData["OEN"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["T"]) != 0 && (score["E"] + score["T"] - scoreData["OET"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) != 0 && (score["M"] + score["S"] - scoreData["OMS"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["N"]) != 0 && (score["M"] + score["N"] - scoreData["OMN"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["T"]) != 0 && (score["M"] + score["T"] - scoreData["OMT"]) < 0) school.riskIndex = true;
-               if ((score["S"] + score["N"]) != 0 && (score["S"] + score["N"] - scoreData["OSN"]) < 0) school.riskIndex = true;
-               if ((score["S"] + score["T"]) != 0 && (score["S"] + score["T"] - scoreData["OST"]) < 0) school.riskIndex = true;
-               if ((score["N"] + score["T"]) != 0 && (score["N"] + score["T"] - scoreData["ONT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] != 0 && (score["C"] + score["E"] + score["M"] - scoreData["OCEM"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] != 0 && (score["C"] + score["E"] + score["S"] - scoreData["OCES"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["N"] != 0 && (score["C"] + score["E"] + score["N"] - scoreData["OCEN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["T"] != 0 && (score["C"] + score["E"] + score["T"] - scoreData["OCET"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] != 0 && (score["C"] + score["M"] + score["S"] - scoreData["OCMS"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["N"] != 0 && (score["C"] + score["M"] + score["N"] - scoreData["OCMN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["T"] != 0 && (score["C"] + score["M"] + score["T"] - scoreData["OCMT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["N"] != 0 && (score["C"] + score["S"] + score["N"] - scoreData["OCSN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["T"] != 0 && (score["C"] + score["S"] + score["T"] - scoreData["OCST"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["N"]) + score["T"] != 0 && (score["C"] + score["N"] + score["T"] - scoreData["OCNT"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] != 0 && (score["E"] + score["M"] + score["S"] - scoreData["OEMS"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["N"] != 0 && (score["E"] + score["M"] + score["N"] - scoreData["OEMN"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["T"] != 0 && (score["E"] + score["M"] + score["T"] - scoreData["OEMT"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["N"] != 0 && (score["E"] + score["S"] + score["N"] - scoreData["OESN"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["T"] != 0 && (score["E"] + score["S"] + score["T"] - scoreData["OEST"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["N"]) + score["T"] != 0 && (score["E"] + score["N"] + score["T"] - scoreData["OENT"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["N"] != 0 && (score["M"] + score["S"] + score["N"] - scoreData["OMSN"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["T"] != 0 && (score["M"] + score["S"] + score["T"] - scoreData["OMST"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["N"]) + score["T"] != 0 && (score["M"] + score["N"] + score["T"] - scoreData["OMNT"]) < 0) school.riskIndex = true;
-               if ((score["S"] + score["N"]) + score["T"] != 0 && (score["S"] + score["N"] + score["T"] - scoreData["OSNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] - scoreData["OCEMS"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] - scoreData["OCEMN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["T"] - scoreData["OCEMT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] - scoreData["OCESN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["T"] - scoreData["OCEST"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["N"] + score["T"] - scoreData["OCENT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["N"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] - scoreData["OCMSN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["T"] - scoreData["OCMST"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["N"] + score["T"] - scoreData["OCMNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["S"]) + score["N"] + score["T"] != 0 && (score["C"] + score["S"] + score["N"] + score["T"] - scoreData["OCSNT"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["N"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OEMSN"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OEMST"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OEMNT"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["S"]) + score["N"] + score["T"] != 0 && (score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OESNT"]) < 0) school.riskIndex = true;
-               if ((score["M"] + score["S"]) + score["N"] + score["T"] != 0 && (score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OMSNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] - scoreData["OCEMSN"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["T"] - scoreData["OCEMST"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["N"] + score["T"] - scoreData["OCEMNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["S"] + score["N"] + score["T"] - scoreData["OCESNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCMSNT"]) < 0) school.riskIndex = true;
-               if ((score["E"] + score["M"]) + score["S"] + score["N"] + score["T"] != 0 && (score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OEMSNT"]) < 0) school.riskIndex = true;
-               if ((score["C"] + score["E"]) + score["M"] + score["S"] + score["N"] + score["T"] != 0 && (score["C"] + score["E"] + score["M"] + score["S"] + score["N"] + score["T"] - scoreData["OCEMSNT"]) < 0) school.riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["C"]) != 0) && (Convert.ToInt32(filter.Rows[i]["C"]) - scoreData["國文"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["E"]) != 0) && (Convert.ToInt32(filter.Rows[i]["E"]) - scoreData["英文"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["M"]) != 0) && (Convert.ToInt32(filter.Rows[i]["M"]) - scoreData["數學"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["N"]) != 0) && (Convert.ToInt32(filter.Rows[i]["N"]) - scoreData["自然"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["S"]) != 0) && (Convert.ToInt32(filter.Rows[i]["S"]) - scoreData["社會"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["T"]) != 0) && (Convert.ToInt32(filter.Rows[i]["T"]) - scoreData["總級分"] > 0)) originalData[i].riskIndex = true;
+                /***************************************************************************************************************************************************/
+                if ((Convert.ToInt32(filter.Rows[i]["CE"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CE"]) - scoreData["OCE"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CM"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CM"]) - scoreData["OCM"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CN"]) - scoreData["OCN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CS"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CS"]) - scoreData["OCS"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CT"]) - scoreData["OCT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EM"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EM"]) - scoreData["OEM"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EN"]) - scoreData["OEN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ES"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ES"]) - scoreData["OES"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ET"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ET"]) - scoreData["OET"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MN"]) - scoreData["OMN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MS"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MS"]) - scoreData["OMS"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MT"]) - scoreData["OMT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["SN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["SN"]) - scoreData["OSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ST"]) - scoreData["OST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["NT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["NT"]) - scoreData["ONT"] > 0)) originalData[i].riskIndex = true;
+                /*****************************************************************************************************************************************************/
+                if ((Convert.ToInt32(filter.Rows[i]["CEM"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEM"]) - scoreData["OCEM"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CES"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CES"]) - scoreData["OCES"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEN"]) - scoreData["OCEN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CET"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CET"]) - scoreData["OCET"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMS"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMS"]) - scoreData["OCMS"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMN"]) - scoreData["OCMN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMT"]) - scoreData["OCMT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CSN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CSN"]) - scoreData["OCSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CST"]) - scoreData["OCST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CNT"]) - scoreData["OCNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMS"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMS"]) - scoreData["OEMS"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMN"]) - scoreData["OEMN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMT"]) - scoreData["OEMT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ESN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ESN"]) - scoreData["OESN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EST"]) - scoreData["OEST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ENT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ENT"]) - scoreData["OENT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MSN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MSN"]) - scoreData["OMSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MST"]) - scoreData["OMST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MNT"]) - scoreData["OMNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["SNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["SNT"]) - scoreData["OSNT"] > 0)) originalData[i].riskIndex = true;
+                /*****************************************************************************************************************************************************/
+                if ((Convert.ToInt32(filter.Rows[i]["CEMS"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMS"]) - scoreData["OCEMS"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEMN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMN"]) - scoreData["OCEMN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEMT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMT"]) - scoreData["OCEMT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CESN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CESN"]) - scoreData["OCESN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEST"]) - scoreData["OCEST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CENT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CENT"]) - scoreData["OCENT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMSN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMSN"]) - scoreData["OCMSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMST"]) - scoreData["OCMST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMNT"]) - scoreData["OCMNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CSNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CSNT"]) - scoreData["OCSNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMSN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMSN"]) - scoreData["OEMSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMST"]) - scoreData["OEMST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMNT"]) - scoreData["OEMNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["ESNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["ESNT"]) - scoreData["OESNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["MSNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["MSNT"]) - scoreData["OMSNT"] > 0)) originalData[i].riskIndex = true;
+                /*****************************************************************************************************************************************************/
+                if ((Convert.ToInt32(filter.Rows[i]["CEMSN"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMSN"]) - scoreData["OCEMSN"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEMST"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMST"]) - scoreData["OCEMST"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEMNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMNT"]) - scoreData["OCEMNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CESNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CESNT"]) - scoreData["OCESNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CMSNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CMSNT"]) - scoreData["OCMSNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["EMSNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["EMSNT"]) - scoreData["OEMSNT"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["CEMSNT"]) != 0) && (Convert.ToInt32(filter.Rows[i]["CEMSNT"]) - scoreData["OCEMSNT"] > 0)) originalData[i].riskIndex = true;
             }
             return originalData;
         }
@@ -333,7 +333,7 @@ namespace PredictionAPI.Models
                     resultData.dname = dt.Rows[i]["DName"].ToString().Trim();
                     resultData.durl = dt.Rows[i]["DURL"].ToString().Trim();
                     resultData.salary = Convert.ToInt32(dt.Rows[i]["Salary"]);
-                    resultData.salaryUrl = dt.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : dt.Rows[i]["SalaryURL"].ToString().Trim();
+                    resultData.salaryUrl = (dt.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : dt.Rows[i]["SalaryURL"].ToString().Trim());
                     resultData.change = (dt.Rows[i]["Change"].Equals("") ? null : dt.Rows[i]["Change"].ToString());
                     resultData.lastCriterion = dt.Rows[i]["lastCriterion"].ToString();
                     resultData.rateOfThisYear = dt.Rows[i]["rateOfThisYear"].ToString();
@@ -341,13 +341,13 @@ namespace PredictionAPI.Models
                     resultData.riskIndex = false;
                     list.Add(resultData);  //放到List中
                 }
-                dt.Clear();
                 this.conn.Close();
-                list = computeRisk(list, data.grades.gsat, SCORECOMBIN);
+                list = computeRisk(list, dt, SCORECOMBIN);
+                dt.Clear();
             }
             catch (SqlException ex)
             {
-                
+                dt.Clear();
                 this.conn.Close();
             }
             return list;
