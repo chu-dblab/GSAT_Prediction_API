@@ -178,7 +178,7 @@ namespace PredictionAPI.Models
                 " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND ((D.City IN (" + city + ") "+"AND D.PP IN (" + attribute + ")) "+ "OR D.UName = '中華大學')" +
                     " AND D.ELLEVEL >= '" + EL + "' "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
-                    " AND D.TL4 <= " + level[3].ToString() + " AND D.TL5 <= " + level[4].ToString() +
+                    " AND D.TL5 <= " + level[3].ToString() + " AND D.TL4 <= " + level[4].ToString() +
                     " AND D.TL6 <= " + level[5].ToString() + " AND D.Salary >= " + expectedSalary.ToString() +
                     " AND D.C <= " + Convert.ToString(oldScore["國文"] + 1) + " AND D.E <= " + Convert.ToString(oldScore["英文"] + 1) + " AND D.M <= " + Convert.ToString(oldScore["數學"] + 1) +
                     " AND D.S <= " + Convert.ToString(oldScore["社會"] + 1) + " AND D.N <= " + Convert.ToString(oldScore["自然"] + 1) + " AND D.T <= " + Convert.ToString(oldScore["總級分"] + 1) +
