@@ -143,6 +143,7 @@
       <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PredictionData.cs" />
+    <Compile Include="Models\QueryData.cs" />
     <Compile Include="Models\T.cs">
       <DependentUpon>GSAT_Prediction_2017.tt</DependentUpon>
     </Compile>

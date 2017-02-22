@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections;
+using GSATPrediction.Models;
 
 namespace PredictionAPI.Models
 {
@@ -14,10 +15,12 @@ namespace PredictionAPI.Models
         private string conStr = ConfigurationManager.ConnectionStrings["PredictionADO"].ConnectionString;
         private SqlConnection conn;
         private DataTable dt;
+        private QueryData db;
         public DataOperation()
         {
             this.conn = new SqlConnection(conStr);
             dt = new DataTable();
+            db = new QueryData();
         }
 
        
@@ -164,18 +167,21 @@ namespace PredictionAPI.Models
             return combination;
         }
 
-        private string appendSQLString(List<string> groups, List<string> cities, Dictionary<string, int> oldScore , ArrayList level, List<string> attributes, string EL, int expectedSalary)
+        private string appendSQLString(List<string> groups, List<string> cities, Dictionary<string, int> oldScore , ArrayList level, List<string> attributes, 
+                                            string EL, int expectedSalary,bool isCHUVersion)
         {
             string group = appendData(groups);
             string city = appendData(cities);
             string attribute = appendData(attributes);
+            string condition = (isCHUVersion? "AND D.UName = '中華大學'":"AND (D.City IN (" + city + ") " + "AND D.PP IN (" + attribute + ") ");
+
             string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP," +
                 "D.C,D.E,D.M,D.S,D.N,D.T,"+
                 "D.CE,D.CM,D.CS,D.CN,D.CT,D.EM,D.ES,D.EN,D.ET,D.MS,D.MN,D.MT,D.SN,D.ST,D.NT,"+
                 "D.CEM,D.CES,D.CEN,D.CET,D.CMS,D.CMN,D.CMT,D.CSN,D.CST,D.CNT,D.EMS,D.EMN,D.EMT,D.ESN,D.EST,D.ENT,D.MSN,D.MST,D.MNT,D.SNT,"+
                 "D.CEMS,D.CEMN,D.CEMT,D.CESN,D.CEST,D.CENT,D.CMSN,D.CMST,D.CMNT,D.CSNT,D.EMSN,D.EMST,D.EMNT,D.ESNT,D.MSNT,"+
                 "D.CEMSN,D.CEMST,D.CEMNT,D.CESNT,D.CMSNT,D.EMSNT,D.CEMSNT" +             
-                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND ((D.City IN (" + city + ") "+"AND D.PP IN (" + attribute + ")) "+ "OR D.UName = '中華大學')" +
+                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + condition +
                     " AND D.ELLEVEL >= '" + EL + "' "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
                     " AND D.TL4 <= " + level[3].ToString() + " AND D.TL5 <= " + level[4].ToString() +
@@ -308,20 +314,14 @@ namespace PredictionAPI.Models
         public List<PredictionResult> SearchResult(Input data)
         {
             List<PredictionResult> list = new List<PredictionResult>();
-            SqlDataAdapter buffer = null;
-            string sqlCom = null;
             ArrayList level = changeScoreOfGSAT2Level(data.grades.gsat);
             if (this.conn.State == ConnectionState.Open) conn.Close();
             try
             {
                 Dictionary<string, int> SCORE= turnToOldScore(data.grades.gsat);
                 Dictionary<string, int> SCORECOMBIN= computeAllSubjectCombination(SCORE);
-                sqlCom = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary);
-                SqlCommand SqlCmd = new SqlCommand(sqlCom, this.conn);
-                SqlCmd.CommandTimeout = 60;
-                this.conn.Open();
-                buffer = new SqlDataAdapter(SqlCmd);
-                buffer.Fill(dt);
+                string cmdStr = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary,false);
+                dt = db.search(cmdStr);
                 PredictionResult resultData;
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {

@@ -98,8 +98,6 @@ namespace GSATPrediction.Controllers
                 };
                 return result;
             }
-
-            return null;
         }
     }
 }
