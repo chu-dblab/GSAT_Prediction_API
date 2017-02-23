@@ -52,6 +52,7 @@ namespace PredictionAPI.Models
         public int status { get; set; }
         public Input input { get; set; }
         public List<PredictionResult> result { get; set; }
+        public List<PredictionResult> resultCHU { get; set; }
         public string message { get; set; }
     }
     public class Enter

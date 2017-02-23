@@ -104,7 +104,7 @@ namespace PredictionAPI.Models
             return oldScore;
         }
 
-        public Dictionary<string,int> computeAllSubjectCombination(Dictionary<string, int> oldScore)
+        private Dictionary<string,int> computeAllSubjectCombination(Dictionary<string, int> oldScore)
         {
             Dictionary<string, int> combination = oldScore;
             combination.Add("OCE", oldScore["國文"] + oldScore["英文"]);
@@ -173,7 +173,7 @@ namespace PredictionAPI.Models
             string group = appendData(groups);
             string city = appendData(cities);
             string attribute = appendData(attributes);
-            string condition = (isCHUVersion? "AND D.UName = '中華大學'":"AND (D.City IN (" + city + ") " + "AND D.PP IN (" + attribute + ") ");
+            string condition = ( isCHUVersion ? "AND D.UName = '中華大學'" : "AND D.City IN (" + city + ") " + "AND D.PP IN (" + attribute + ") " );
 
             string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP," +
                 "D.C,D.E,D.M,D.S,D.N,D.T,"+
@@ -184,7 +184,7 @@ namespace PredictionAPI.Models
                 " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + condition +
                     " AND D.ELLEVEL >= '" + EL + "' "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
-                    " AND D.TL4 <= " + level[3].ToString() + " AND D.TL5 <= " + level[4].ToString() +
+                    " AND D.TL5 <= " + level[3].ToString() + " AND D.TL4 <= " + level[4].ToString() +
                     " AND D.TL6 <= " + level[5].ToString() + " AND D.Salary >= " + expectedSalary.ToString() +
                     " AND D.C <= " + Convert.ToString(oldScore["國文"] + 1) + " AND D.E <= " + Convert.ToString(oldScore["英文"] + 1) + " AND D.M <= " + Convert.ToString(oldScore["數學"] + 1) +
                     " AND D.S <= " + Convert.ToString(oldScore["社會"] + 1) + " AND D.N <= " + Convert.ToString(oldScore["自然"] + 1) + " AND D.T <= " + Convert.ToString(oldScore["總級分"] + 1) +
@@ -240,7 +240,7 @@ namespace PredictionAPI.Models
         {
             for(int i=0;i< originalData.Count;i++)
             {
-                if ((Convert.ToInt32(filter.Rows[i]["C"]) != 0) && (Convert.ToInt32(filter.Rows[i]["C"]) - scoreData["國文"] > 0)) originalData[i].riskIndex = true;
+                if ((Convert.ToInt32(filter.Rows[i]["C"]) != 0) && (Convert.ToInt32(filter.Rows[i]["C"]) - scoreData["國文"]) > 0) originalData[i].riskIndex = true;
                 if ((Convert.ToInt32(filter.Rows[i]["E"]) != 0) && (Convert.ToInt32(filter.Rows[i]["E"]) - scoreData["英文"] > 0)) originalData[i].riskIndex = true;
                 if ((Convert.ToInt32(filter.Rows[i]["M"]) != 0) && (Convert.ToInt32(filter.Rows[i]["M"]) - scoreData["數學"] > 0)) originalData[i].riskIndex = true;
                 if ((Convert.ToInt32(filter.Rows[i]["N"]) != 0) && (Convert.ToInt32(filter.Rows[i]["N"]) - scoreData["自然"] > 0)) originalData[i].riskIndex = true;
@@ -311,46 +311,75 @@ namespace PredictionAPI.Models
             return originalData;
         }
 
-        public List<PredictionResult> SearchResult(Input data)
+        private List<PredictionResult> InsertDataToDTO(DataTable table)
         {
             List<PredictionResult> list = new List<PredictionResult>();
+            PredictionResult resultData;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                resultData = new PredictionResult();
+                //將搜尋到的東西封裝成Object
+                resultData.did = table.Rows[i]["DID"].ToString();
+                resultData.uname = table.Rows[i]["UName"].ToString().Trim();
+                resultData.uurl = table.Rows[i]["UURL"].ToString().Trim();
+                resultData.dname = table.Rows[i]["DName"].ToString().Trim();
+                resultData.durl = table.Rows[i]["DURL"].ToString().Trim();
+                resultData.salary = Convert.ToInt32(table.Rows[i]["Salary"]);
+                resultData.salaryUrl = (table.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : table.Rows[i]["SalaryURL"].ToString().Trim());
+                resultData.change = (table.Rows[i]["Change"].Equals(string.Empty) ? null : table.Rows[i]["Change"].ToString());
+                resultData.lastCriterion = table.Rows[i]["lastCriterion"].ToString();
+                resultData.rateOfThisYear = table.Rows[i]["rateOfThisYear"].ToString();
+                resultData.examURL = table.Rows[i]["ExamURL"].ToString();
+                resultData.riskIndex = false;
+                list.Add(resultData);  //放到List中
+            }
+            return list;
+        }
+
+        public List<PredictionResult> SearchResult(Input data)
+        {
             ArrayList level = changeScoreOfGSAT2Level(data.grades.gsat);
             if (this.conn.State == ConnectionState.Open) conn.Close();
+            List<PredictionResult> list = null;
             try
             {
                 Dictionary<string, int> SCORE= turnToOldScore(data.grades.gsat);
                 Dictionary<string, int> SCORECOMBIN= computeAllSubjectCombination(SCORE);
                 string cmdStr = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary,false);
                 dt = db.search(cmdStr);
-                PredictionResult resultData;
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    resultData = new PredictionResult();
-                    //將搜尋到的東西封裝成Object
-                    resultData.did = dt.Rows[i]["DID"].ToString();
-                    resultData.uname = dt.Rows[i]["UName"].ToString().Trim();
-                    resultData.uurl = dt.Rows[i]["UURL"].ToString().Trim();
-                    resultData.dname = dt.Rows[i]["DName"].ToString().Trim();
-                    resultData.durl = dt.Rows[i]["DURL"].ToString().Trim();
-                    resultData.salary = Convert.ToInt32(dt.Rows[i]["Salary"]);
-                    resultData.salaryUrl = (dt.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : dt.Rows[i]["SalaryURL"].ToString().Trim());
-                    resultData.change = (dt.Rows[i]["Change"].Equals("") ? null : dt.Rows[i]["Change"].ToString());
-                    resultData.lastCriterion = dt.Rows[i]["lastCriterion"].ToString();
-                    resultData.rateOfThisYear = dt.Rows[i]["rateOfThisYear"].ToString();
-                    resultData.examURL = dt.Rows[i]["ExamURL"].ToString();
-                    resultData.riskIndex = false;
-                    list.Add(resultData);  //放到List中
-                }
-                this.conn.Close();
+                list = InsertDataToDTO(dt);
                 list = computeRisk(list, dt, SCORECOMBIN);
                 dt.Clear();
+                return list;
             }
             catch (SqlException ex)
             {
                 dt.Clear();
-                this.conn.Close();
+                return list;
             }
-            return list;
+        }
+
+        public List<PredictionResult> SearchResultCHU(Input data)
+        {
+            ArrayList level = changeScoreOfGSAT2Level(data.grades.gsat);
+            if (this.conn.State == ConnectionState.Open) conn.Close();
+            List<PredictionResult> list = null;
+            try
+            {
+                Dictionary<string, int> SCORE = turnToOldScore(data.grades.gsat);
+                Dictionary<string, int> SCORECOMBIN = computeAllSubjectCombination(SCORE);
+                string cmdStr = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary, true);
+                dt = db.search(cmdStr);
+                list = InsertDataToDTO(dt);
+                list = computeRisk(list, dt, SCORECOMBIN);
+                dt.Clear();
+                return list;
+            }
+            catch (SqlException ex)
+            {
+                dt.Clear();
+                return list;
+            }
         }
     }
 }
