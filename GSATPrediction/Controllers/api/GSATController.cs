@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace GSATPrediction.Controllers
 {
@@ -74,10 +75,12 @@ namespace GSATPrediction.Controllers
                 Input obj = JsonConvert.DeserializeObject<Input>(data.ToString());
                 op = new DataOperation();
                 List<PredictionResult> list = op.SearchResult(obj);
+                List<PredictionResult> listCHU = op.SearchResultCHU(obj);
                 Output rootData = new Output();
                 rootData.status = Convert.ToInt32(HttpStatusCode.OK);
                 rootData.input = obj;
                 rootData.result = list;
+                rootData.resultCHU = listCHU;
                 rootData.message = "Success~!!";
                 JObject jsonData = JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(rootData));
                 var result = new HttpResponseMessage(HttpStatusCode.OK)
@@ -98,8 +101,6 @@ namespace GSATPrediction.Controllers
                 };
                 return result;
             }
-
-            return null;
         }
     }
 }

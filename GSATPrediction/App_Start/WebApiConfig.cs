@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace GSATPrediction
 {
@@ -10,7 +11,6 @@ namespace GSATPrediction
         public static void Register(HttpConfiguration config)
         {
             // Web API 設定和服務
-
             // Web API 路由
             config.MapHttpAttributeRoutes();
 
@@ -19,6 +19,10 @@ namespace GSATPrediction
                 routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            //允許CORS
+            //var cors = new EnableCorsAttribute("*", "*", "*");
+            //config.EnableCors(cors);
 
             var appXmlType = config.Formatters.XmlFormatter.SupportedMediaTypes.FirstOrDefault(
             t => t.MediaType == "application/xml");

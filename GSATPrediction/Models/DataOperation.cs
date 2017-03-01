@@ -6,20 +6,39 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections;
+using GSATPrediction.Models;
 
 namespace PredictionAPI.Models
 {
     public class DataOperation
     {
-        private string conStr = ConfigurationManager.ConnectionStrings["PredictionADO"].ConnectionString;
+        private string conStr;
         private SqlConnection conn;
         private DataTable dt;
+        private QueryData db;
+
         public DataOperation()
         {
-            this.conn = new SqlConnection(conStr);
+            conStr = ConfigurationManager.ConnectionStrings["PredictionADO"].ConnectionString;
+            conn = new SqlConnection(conStr);
             dt = new DataTable();
+            db = new QueryData();
         }
 
+
+        private int[] changeToArray(Gsat gsat)
+        {
+            int sum = (gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese)) +
+                (gsat.English == null ? 0 : Convert.ToInt32(gsat.English)) + (gsat.Math == null ? 0 : Convert.ToInt32(gsat.Math)) +
+                (gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science)) + (gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society));
+
+            int[] score = { gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese),
+                                     gsat.English == null ? 0 : Convert.ToInt32(gsat.English),
+                                     gsat.Math == null ? 0 :Convert.ToInt32(gsat.Math),
+                                     gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science),
+                                     gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society), sum };
+            return score;
+        }
        
         /// <summary>
         /// 將學測級分轉換成等級
@@ -30,15 +49,7 @@ namespace PredictionAPI.Models
         {
             string sqlCom = null;
             int LV = 0;
-            int sum = (gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese) )+ 
-                (gsat.English == null ? 0 : Convert.ToInt32(gsat.English)) +(gsat.Math == null ? 0 : Convert.ToInt32(gsat.Math)) +
-                (gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science)) + (gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society));
-
-            int[] score104OfGSAT = { gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese),
-                                     gsat.English == null ? 0 : Convert.ToInt32(gsat.English),
-                                     gsat.Math == null ? 0 :Convert.ToInt32(gsat.Math),
-                                     gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science),
-                                     gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society), sum };
+            int[] scoreOfGSAT = changeToArray(gsat);
         
             string[] subjectOfGSAT = { "國文", "英文", "數學", "自然", "社會" ,"總級分"};
             SqlDataAdapter buffer = null;
@@ -51,11 +62,11 @@ namespace PredictionAPI.Models
                 buffer = new SqlDataAdapter(sqlCom, this.conn);
                 buffer.Fill(dt);
 
-                if (score104OfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade1"].ToString())) LV = 0;
-                else if (score104OfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade2"].ToString())) LV = 1;
-                else if (score104OfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade3"].ToString())) LV = 2;
-                else if (score104OfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade4"].ToString())) LV = 3;
-                else if (score104OfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade5"].ToString())) LV = 4;
+                if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade1"].ToString())) LV = 0;
+                else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade2"].ToString())) LV = 1;
+                else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade3"].ToString())) LV = 2;
+                else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade4"].ToString())) LV = 3;
+                else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade5"].ToString())) LV = 4;
                 else LV = 5;
                 level.Add(LV);
                 dt.Clear();
@@ -70,17 +81,8 @@ namespace PredictionAPI.Models
             string sqlCom = null;
             SqlDataAdapter buffer = null;
             Dictionary<string,int> oldScore = new Dictionary<string, int>();
-            int sum = gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese) +
-                     gsat.English == null ? 0 : Convert.ToInt32(gsat.English) +
-                     gsat.Math == null ? 0 : Convert.ToInt32(gsat.Math) +
-                     gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science) +
-                     gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society);
-
-            int[] newScore = {  gsat.Chinese == null ? 0 : Convert.ToInt32(gsat.Chinese),
-                                     gsat.English == null ? 0 : Convert.ToInt32(gsat.English),
-                                     gsat.Math == null ? 0 :Convert.ToInt32(gsat.Math),
-                                     gsat.Science == null ? 0 : Convert.ToInt32(gsat.Science),
-                                     gsat.Society == null ? 0 : Convert.ToInt32(gsat.Society), sum  };
+           
+            int[] newScore = changeToArray(gsat);
 
             string[] subject= { "國文", "英文", "數學", "自然", "社會", "總級分" };
 
@@ -101,81 +103,87 @@ namespace PredictionAPI.Models
             return oldScore;
         }
 
-        public Dictionary<string,int> computeAllSubjectCombination(Dictionary<string, int> oldScore)
+        private Dictionary<string,int> computeAllSubjectCombination(Dictionary<string, int> oldScore)
         {
             Dictionary<string, int> combination = oldScore;
-            combination.Add("OCE", oldScore["國文"] + oldScore["英文"]);
-            combination.Add("OCM", oldScore["國文"] + oldScore["數學"]);
-            combination.Add("OCS", oldScore["國文"] + oldScore["社會"]);
-            combination.Add("OCN", oldScore["國文"] + oldScore["自然"]);
-            combination.Add("OCT", oldScore["國文"] + oldScore["總級分"]);
-            combination.Add("OEM", oldScore["英文"] + oldScore["數學"]);
-            combination.Add("OES", oldScore["英文"] + oldScore["社會"]);
-            combination.Add("OEN", oldScore["英文"] + oldScore["自然"]);
-            combination.Add("OET", oldScore["英文"] + oldScore["總級分"]);
-            combination.Add("OMS", oldScore["數學"] + oldScore["社會"]);
-            combination.Add("OMN", oldScore["數學"] + oldScore["自然"]);
-            combination.Add("OMT", oldScore["數學"] + oldScore["總級分"]);
-            combination.Add("OSN", oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OST", oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("ONT", oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCEM", oldScore["國文"] + oldScore["英文"] + oldScore["數學"]);
-            combination.Add("OCES", oldScore["國文"] + oldScore["英文"] + oldScore["社會"]);
-            combination.Add("OCEN", oldScore["國文"] + oldScore["英文"] + oldScore["自然"]);
-            combination.Add("OCET", oldScore["國文"] + oldScore["英文"] + oldScore["總級分"]);
-            combination.Add("OCMS", oldScore["國文"] + oldScore["數學"] + oldScore["社會"]);
-            combination.Add("OCMN", oldScore["國文"] + oldScore["數學"] + oldScore["自然"]);
-            combination.Add("OCMT", oldScore["國文"] + oldScore["數學"] + oldScore["總級分"]);
-            combination.Add("OCSN", oldScore["國文"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OCST", oldScore["國文"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OCNT", oldScore["國文"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OEMS", oldScore["英文"] + oldScore["數學"] + oldScore["社會"]);
-            combination.Add("OEMN", oldScore["英文"] + oldScore["數學"] + oldScore["自然"]);
-            combination.Add("OEMT", oldScore["英文"] + oldScore["數學"] + oldScore["總級分"]);
-            combination.Add("OESN", oldScore["英文"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OEST", oldScore["英文"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OENT", oldScore["英文"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OMSN", oldScore["數學"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OMST", oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OMNT", oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OSNT", oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCEMS", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"]);
-            combination.Add("OCEMN", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["自然"]);
-            combination.Add("OCEMT", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["總級分"]);
-            combination.Add("OCESN", oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OCEST", oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OCENT", oldScore["國文"] + oldScore["英文"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCMSN", oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OCMST", oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OCMNT", oldScore["國文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCSNT", oldScore["國文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OEMSN", oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OEMST", oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OEMNT", oldScore["英文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OESNT", oldScore["英文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OMSNT", oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCEMSN", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]);
-            combination.Add("OCEMST", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]);
-            combination.Add("OCEMNT", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCESNT", oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCMSNT", oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OEMSNT", oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);
-            combination.Add("OCEMSNT", oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]);            
+            combination.Add("OCE", (oldScore["國文"] + oldScore["英文"]));
+            combination.Add("OCM", (oldScore["國文"] + oldScore["數學"]));
+            combination.Add("OCS", (oldScore["國文"] + oldScore["社會"]));
+            combination.Add("OCN", (oldScore["國文"] + oldScore["自然"]));
+            combination.Add("OCT", (oldScore["國文"] + oldScore["總級分"]));
+            combination.Add("OEM", (oldScore["英文"] + oldScore["數學"]));
+            combination.Add("OES", (oldScore["英文"] + oldScore["社會"]));
+            combination.Add("OEN", (oldScore["英文"] + oldScore["自然"]));
+            combination.Add("OET", (oldScore["英文"] + oldScore["總級分"]));
+            combination.Add("OMS", (oldScore["數學"] + oldScore["社會"]));
+            combination.Add("OMN", (oldScore["數學"] + oldScore["自然"]));
+            combination.Add("OMT", (oldScore["數學"] + oldScore["總級分"]));
+            combination.Add("OSN", (oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OST", (oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("ONT", (oldScore["自然"] + oldScore["總級分"]));
+            /******************************************************************************************************************/
+            combination.Add("OCEM", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"]));
+            combination.Add("OCES", (oldScore["國文"] + oldScore["英文"] + oldScore["社會"]));
+            combination.Add("OCEN", (oldScore["國文"] + oldScore["英文"] + oldScore["自然"]));
+            combination.Add("OCET", (oldScore["國文"] + oldScore["英文"] + oldScore["總級分"]));
+            combination.Add("OCMS", (oldScore["國文"] + oldScore["數學"] + oldScore["社會"]));
+            combination.Add("OCMN", (oldScore["國文"] + oldScore["數學"] + oldScore["自然"]));
+            combination.Add("OCMT", (oldScore["國文"] + oldScore["數學"] + oldScore["總級分"]));
+            combination.Add("OCSN", (oldScore["國文"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OCST", (oldScore["國文"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OCNT", (oldScore["國文"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OEMS", (oldScore["英文"] + oldScore["數學"] + oldScore["社會"]));
+            combination.Add("OEMN", (oldScore["英文"] + oldScore["數學"] + oldScore["自然"]));
+            combination.Add("OEMT", (oldScore["英文"] + oldScore["數學"] + oldScore["總級分"]));
+            combination.Add("OESN", (oldScore["英文"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OEST", (oldScore["英文"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OENT", (oldScore["英文"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OMSN", (oldScore["數學"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OMST", (oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OMNT", (oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OSNT", (oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            /************************************************************************************************************************************/
+            combination.Add("OCEMS", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"]));
+            combination.Add("OCEMN", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["自然"]));
+            combination.Add("OCEMT", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["總級分"]));
+            combination.Add("OCESN", (oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OCEST", (oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OCENT", (oldScore["國文"] + oldScore["英文"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OCMSN", (oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OCMST", (oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OCMNT", (oldScore["國文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OCSNT", (oldScore["國文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OEMSN", (oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OEMST", (oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OEMNT", (oldScore["英文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OESNT", (oldScore["英文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OMSNT", (oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            /************************************************************************************************************************************/
+            combination.Add("OCEMSN", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"]));
+            combination.Add("OCEMST", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["總級分"]));
+            combination.Add("OCEMNT", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OCESNT", (oldScore["國文"] + oldScore["英文"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OCMSNT", (oldScore["國文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OEMSNT", (oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));
+            combination.Add("OCEMSNT", (oldScore["國文"] + oldScore["英文"] + oldScore["數學"] + oldScore["社會"] + oldScore["自然"] + oldScore["總級分"]));            
             return combination;
         }
 
-        private string appendSQLString(List<string> groups, List<string> cities, Dictionary<string, int> oldScore , ArrayList level, List<string> attributes, string EL, int expectedSalary)
+        private string appendSQLString(List<string> groups, List<string> cities, Dictionary<string, int> oldScore , ArrayList level, List<string> attributes, 
+                                            string EL, int expectedSalary,bool isCHUVersion)
         {
             string group = appendData(groups);
             string city = appendData(cities);
             string attribute = appendData(attributes);
+            string condition = ( isCHUVersion ? "AND D.UName = '中華大學'" : "AND D.City IN (" + city + ") " + "AND D.PP IN (" + attribute + ") " );
+
             string command = "SELECT DISTINCT D.DID, D.UName, D.UURL, D.DName, D.DURL, D.Salary, D.SalaryURL, D.lastCriterion, D.rateOfThisYear, D.Change, D.ExamURL,D.PP," +
                 "D.C,D.E,D.M,D.S,D.N,D.T,"+
                 "D.CE,D.CM,D.CS,D.CN,D.CT,D.EM,D.ES,D.EN,D.ET,D.MS,D.MN,D.MT,D.SN,D.ST,D.NT,"+
                 "D.CEM,D.CES,D.CEN,D.CET,D.CMS,D.CMN,D.CMT,D.CSN,D.CST,D.CNT,D.EMS,D.EMN,D.EMT,D.ESN,D.EST,D.ENT,D.MSN,D.MST,D.MNT,D.SNT,"+
                 "D.CEMS,D.CEMN,D.CEMT,D.CESN,D.CEST,D.CENT,D.CMSN,D.CMST,D.CMNT,D.CSNT,D.EMSN,D.EMST,D.EMNT,D.ESNT,D.MSNT,"+
                 "D.CEMSN,D.CEMST,D.CEMNT,D.CESNT,D.CMSNT,D.EMSNT,D.CEMSNT" +             
-                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + "AND ((D.City IN (" + city + ") "+"AND D.PP IN (" + attribute + ")) "+ "OR D.UName = '中華大學')" +
+                " FROM D,DC,CG WHERE  D.DID=DC.DID AND DC.CNAME=CG.CNAME AND CG.GNAME IN (" + group + ") " + condition +
                     " AND D.ELLEVEL >= '" + EL + "' "+"AND D.TL1 <= " + level[0].ToString() + 
                     " AND D.TL2 <= " + level[1].ToString() + " AND D.TL3 <= " + level[2].ToString() +
                     " AND D.TL5 <= " + level[3].ToString() + " AND D.TL4 <= " + level[4].ToString() +
@@ -232,7 +240,7 @@ namespace PredictionAPI.Models
 
         private List<PredictionResult> computeRisk(List<PredictionResult> originalData, DataTable filter, Dictionary<string, int> scoreData)
         {
-            for(int i=0;i< originalData.Count;i++)
+            for (int i = 0; i < originalData.Count; i++)
             {
                 if ((Convert.ToInt32(filter.Rows[i]["C"]) != 0) && (Convert.ToInt32(filter.Rows[i]["C"]) - scoreData["國文"] > 0)) originalData[i].riskIndex = true;
                 if ((Convert.ToInt32(filter.Rows[i]["E"]) != 0) && (Convert.ToInt32(filter.Rows[i]["E"]) - scoreData["英文"] > 0)) originalData[i].riskIndex = true;
@@ -305,52 +313,75 @@ namespace PredictionAPI.Models
             return originalData;
         }
 
-        public List<PredictionResult> SearchResult(Input data)
+        private List<PredictionResult> InsertDataToDTO(DataTable table)
         {
             List<PredictionResult> list = new List<PredictionResult>();
-            SqlDataAdapter buffer = null;
-            string sqlCom = null;
+            PredictionResult resultData;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                resultData = new PredictionResult();
+                //將搜尋到的東西封裝成Object
+                resultData.did = table.Rows[i]["DID"].ToString();
+                resultData.uname = table.Rows[i]["UName"].ToString().Trim();
+                resultData.uurl = table.Rows[i]["UURL"].ToString().Trim();
+                resultData.dname = table.Rows[i]["DName"].ToString().Trim();
+                resultData.durl = table.Rows[i]["DURL"].ToString().Trim();
+                resultData.salary = Convert.ToInt32(table.Rows[i]["Salary"]);
+                resultData.salaryUrl = (table.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : table.Rows[i]["SalaryURL"].ToString().Trim());
+                resultData.change = (table.Rows[i]["Change"].Equals(string.Empty) ? null : table.Rows[i]["Change"].ToString());
+                resultData.lastCriterion = table.Rows[i]["lastCriterion"].ToString();
+                resultData.rateOfThisYear = table.Rows[i]["rateOfThisYear"].ToString();
+                resultData.examURL = table.Rows[i]["ExamURL"].ToString();
+                resultData.riskIndex = false;
+                list.Add(resultData);  //放到List中
+            }
+            return list;
+        }
+
+        public List<PredictionResult> SearchResult(Input data)
+        {
             ArrayList level = changeScoreOfGSAT2Level(data.grades.gsat);
             if (this.conn.State == ConnectionState.Open) conn.Close();
+            List<PredictionResult> list = null;
             try
             {
                 Dictionary<string, int> SCORE= turnToOldScore(data.grades.gsat);
                 Dictionary<string, int> SCORECOMBIN= computeAllSubjectCombination(SCORE);
-                sqlCom = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary);
-                SqlCommand SqlCmd = new SqlCommand(sqlCom, this.conn);
-                SqlCmd.CommandTimeout = 60;
-                this.conn.Open();
-                buffer = new SqlDataAdapter(SqlCmd);
-                buffer.Fill(dt);
-                PredictionResult resultData;
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    resultData = new PredictionResult();
-                    //將搜尋到的東西封裝成Object
-                    resultData.did = dt.Rows[i]["DID"].ToString();
-                    resultData.uname = dt.Rows[i]["UName"].ToString().Trim();
-                    resultData.uurl = dt.Rows[i]["UURL"].ToString().Trim();
-                    resultData.dname = dt.Rows[i]["DName"].ToString().Trim();
-                    resultData.durl = dt.Rows[i]["DURL"].ToString().Trim();
-                    resultData.salary = Convert.ToInt32(dt.Rows[i]["Salary"]);
-                    resultData.salaryUrl = (dt.Rows[i]["SalaryURL"].ToString().Trim() == Convert.ToString(0) ? null : dt.Rows[i]["SalaryURL"].ToString().Trim());
-                    resultData.change = (dt.Rows[i]["Change"].Equals("") ? null : dt.Rows[i]["Change"].ToString());
-                    resultData.lastCriterion = dt.Rows[i]["lastCriterion"].ToString();
-                    resultData.rateOfThisYear = dt.Rows[i]["rateOfThisYear"].ToString();
-                    resultData.examURL = dt.Rows[i]["ExamURL"].ToString();
-                    resultData.riskIndex = false;
-                    list.Add(resultData);  //放到List中
-                }
-                this.conn.Close();
+                string cmdStr = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary,false);
+                dt = db.search(cmdStr);
+                list = InsertDataToDTO(dt);
                 list = computeRisk(list, dt, SCORECOMBIN);
                 dt.Clear();
+                return list;
             }
             catch (SqlException ex)
             {
                 dt.Clear();
-                this.conn.Close();
+                return list;
             }
-            return list;
+        }
+
+        public List<PredictionResult> SearchResultCHU(Input data)
+        {
+            ArrayList level = changeScoreOfGSAT2Level(data.grades.gsat);
+            if (this.conn.State == ConnectionState.Open) conn.Close();
+            List<PredictionResult> list = null;
+            try
+            {
+                Dictionary<string, int> SCORE = turnToOldScore(data.grades.gsat);
+                Dictionary<string, int> SCORECOMBIN = computeAllSubjectCombination(SCORE);
+                string cmdStr = appendSQLString(data.groups, data.location, SCORECOMBIN, level, data.property, data.grades.gsat.EngListeningLevel, data.expect_salary, true);
+                dt = db.search(cmdStr);
+                list = InsertDataToDTO(dt);
+                list = computeRisk(list, dt, SCORECOMBIN);
+                dt.Clear();
+                return list;
+            }
+            catch (SqlException ex)
+            {
+                dt.Clear();
+                return list;
+            }
         }
     }
 }
