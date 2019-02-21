@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections;
 using GSATPrediction.Models;
+using Dapper;
 
 namespace PredictionAPI.Models
 {
@@ -53,8 +54,8 @@ namespace PredictionAPI.Models
         
             string[] subjectOfGSAT = { "國文", "英文", "數學", "自然", "社會" ,"總級分"};
             SqlDataAdapter buffer = null;
-            ArrayList level = new ArrayList();
-            this.conn.Open();
+            ArrayList standar = new ArrayList();
+           
             for (int i = 0; i < 6; i++)
             {
                 sqlCom = "SELECT Grade1,Grade2,Grade3,Grade4,Grade5 " +
@@ -68,12 +69,13 @@ namespace PredictionAPI.Models
                 else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade4"].ToString())) LV = 3;
                 else if (scoreOfGSAT[i] < Convert.ToInt32(dt.Rows[0]["Grade5"].ToString())) LV = 4;
                 else LV = 5;
-                level.Add(LV);
+                standar.Add(LV);
                 dt.Clear();
             }
             buffer.Dispose();
             this.conn.Close();
-            return level;
+
+            return standar;
         }
 
         public Dictionary<string, int> turnToOldScore(Gsat gsat)

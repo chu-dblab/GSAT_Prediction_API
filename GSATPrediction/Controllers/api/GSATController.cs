@@ -59,7 +59,8 @@ namespace GSATPrediction.Controllers
                        new JObject(
                        new JProperty("status", HttpStatusCode.BadRequest),
                        new JProperty("input", point),
-                       new JProperty("Message", "解析錯誤~!!")), new JsonMediaTypeFormatter())
+                       new JProperty("Message", "解析錯誤~!!"),
+                       new JProperty("SystemLog", ex.Data)), new JsonMediaTypeFormatter())
                 };
                 return result;
             }
@@ -97,7 +98,8 @@ namespace GSATPrediction.Controllers
                        new JObject(
                        new JProperty("status", HttpStatusCode.BadRequest),
                        new JProperty("input", data),
-                       new JProperty("Message", "解析錯誤~!!")), new JsonMediaTypeFormatter())
+                       new JProperty("Message", "解析錯誤~!!"),
+                       new JProperty("SystemLog", ex.Data)), new JsonMediaTypeFormatter())
                 };
                 return result;
             }
